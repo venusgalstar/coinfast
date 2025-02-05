@@ -13,6 +13,7 @@ import usePresale from "../hooks/usePresale.js"
 import { Icon, IconType } from "../components/icons.js";
 import { Divider } from "@mui/material"
 import {numberWithCommas} from "../utils/index.js"
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const Createcoin = () => {
 
@@ -30,25 +31,7 @@ const Createcoin = () => {
                         <p className="text-gray-300 mb-3">
                             Please connect your wallet to continue
                         </p>
-                        <div className="wallet-adapter-dropdown">
-                            <button
-                            className="wallet-adapter-button wallet-adapter-button-trigger"
-                            tabIndex={0}
-                            type="button"
-                            style={{ pointerEvents: "auto" }}
-                            >
-                            Select Wallet
-                            </button>
-                            <ul
-                            aria-label="dropdown-list"
-                            className="wallet-adapter-dropdown-list false"
-                            role="menu"
-                            >
-                            <li className="wallet-adapter-dropdown-list-item" role="menuitem">
-                                Change wallet
-                            </li>
-                            </ul>
-                        </div>
+                        <WalletMultiButton />
                         </div>
                     </div>
                     </div>

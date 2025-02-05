@@ -24,6 +24,10 @@ import HowToAndFaq from './pages/howToAndFaq';
 import Copyright from './pages/copyright';
 import Createcoin from './pages/createcoin';
 import Footer from './layouts/footer';
+import { WalletModalProvider, WalletDisconnectButton, WalletModalButton } from '@solana/wallet-adapter-react-ui';
+
+// Default styles that can be overridden by your app
+require('@solana/wallet-adapter-react-ui/styles.css');
 
 function App() {
 
@@ -37,6 +41,7 @@ function App() {
     <div className="flex flex-col min-h-screen">
       <ThemeContext.Provider value={tokens}>
         <WalletConnectProvider>
+          <WalletModalProvider>
             <div className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-cyan-500 to-purple-600">
                 <div className="container mx-auto px-4">
                 <div className="py-1.5 text-center text-[9px] leading-none md:text-xs text-white font-bold tracking-wide">
@@ -86,6 +91,7 @@ function App() {
           <Copyright />
            */}
           <ToastContainer autoClose={3000} draggableDirection="x" toastStyle={{ backgroundColor: "#05bfc4", color: "white" }} />
+          </WalletModalProvider>
         </WalletConnectProvider>
       </ThemeContext.Provider>
     </div>

@@ -2,6 +2,7 @@
 import { toast } from "react-toastify";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useState } from "react";
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const navStringList = [
     {title:'Create Token', url:'/', target:'', rel:''},
@@ -16,7 +17,6 @@ const Navbar = () => {
 
     const [animationClass, setAnimationClass] = useState("slide-down");
     const [toggleMenu, setToggleMenu] = useState(false);
-    const [toggleLang, setToggleLang] = useState(false);
 
     //const [initialState, setInitialState] = useState({});
 
@@ -101,32 +101,8 @@ const Navbar = () => {
                         ))}
                     </div>
                 </div>
-                {/* <div className="flex items-center justify-end ml-auto">
-                    <button className="h-9 flex flex-row items-center justify-center rounded-3xl px-4 py-2 text-[12px] bg-cyan-500" onClick={onWalletConnect}>
-                        {!publicKey ? "Connect Wallet" : publicKey.toBase58().slice(0, 4) + " ... " + publicKey.toBase58().slice(-4)}
-                    </button>
-                    
-                </div> */}
                 <div className="flex items-center justify-end ml-auto">
-                    <div className="wallet-adapter-dropdown">
-                        <button
-                            className="wallet-adapter-button wallet-adapter-button-trigger"
-                            tabIndex={0}
-                            type="button"
-                            style={{ pointerEvents: "auto" }}
-                        >
-                        Select Wallet
-                        </button>
-                        <ul
-                            aria-label="dropdown-list"
-                            className="wallet-adapter-dropdown-list false"
-                            role="menu"
-                        >
-                        <li className="wallet-adapter-dropdown-list-item" role="menuitem">
-                            Change wallet
-                        </li>
-                        </ul>
-                    </div>
+                    <WalletMultiButton />
                 </div>
                 {toggleMenu &&(
                     <div className="md:hidden absolute top-full left-0 right-0 bg-gray-800/95 backdrop-blur-sm border-b border-gray-700/50">
