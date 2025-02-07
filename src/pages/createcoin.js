@@ -1,18 +1,27 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import axios from 'axios';
 import "./pages.css"
+
 import {
     useConnection,
     useWallet
 } from "@solana/wallet-adapter-react";
-import * as splToken from "@solana/spl-token";
-import {
-    TOKEN_DECIMAL,
-    TOKEN_PUBKEY,
-} from "../constants/index.js"
+
 import HowToAndFaq from './howToAndFaq';
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
-import useMeme from '../hooks/useMeme.js';
+
+import {
+  pinFileToPinata,
+  //pinJsonToNFTStorage,
+  pinJsonToPinata,
+} from "../hooks/pinatasdk";
+import {
+  USE_JITO,
+  createToken,
+  setMintAuthority,
+  sendAndConfirmSignedTransactions,
+  getTipTransaction,
+} from "../hooks/solana";
 
 const default_formdata = {
     name:'',
@@ -33,19 +42,18 @@ const default_formdata = {
 const Createcoin = () => {
 
     //const { claimToken, transactionPending, buyAmount, claimedAmount } = usePresale();
-    const {createToken} = useMeme();
+    const { connection } = useConnection();
     const { select, wallets, publicKey, disconnect } = useWallet();
     const [currentStep, setCurrentStep] = useState(0);
-    const [splTokenImg, setTokenImg] = useState("");
     const [formdata, setFormData] = useState(default_formdata);
+    const [isMutable, setIsMutable] = useState(false);
+    const [mintPvKey, setMintPvKey] = useState("");
+    
     const fileInputRef = useRef(null);
+    
     
     const handleNextStep = (_step)=> {
         setCurrentStep(_step);
-    }
-    
-    const handleCreateToken = ()=>{
-        createToken(formdata.name, formdata.symbol, formdata.decimals, formdata.totalSupply);
     }
 
     const handlePrevStep = (_step)=> {
@@ -60,31 +68,136 @@ const Createcoin = () => {
             fileInputRef.current.click();
         }
     };
-
-    const uploadImgHandler = async (e) => {
-        const file = e.target.files[0];
-        const formDatat = new FormData();
-        formDatat.append("image", file);
-        if (file === undefined) return;
-        setFormData({...formdata, file:file});
-        //console.log("uploadImgHandler");
-        try {
-          const config = {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          };
     
-          const { data } = await axios.post(
-            "http://localhost:5000/api/v1/uploads",
-            formDatat,
-            config
-          );
-          console.log("data", data);
-          setEmployeeImg(data);
-        } catch (error) {
-          console.error(error);
-        }
+    const handleUploadLogo = async (e) => {
+      const file = e.target.files[0];
+      if (file === undefined) return;
+        setFormData({...formdata, file:file});
+      //setLoadingPrompt("Uploading logo...");
+      //setOpenLoading(true);
+      try {
+          console.log(file);
+          const uri = await pinFileToPinata(file);
+          console.log(uri);
+          //setLogo(uri);
+          //toast.success("Succeed to upload logo!");
+      } catch (err) {
+          console.log(err);
+          // try {
+          //     const uri = await pinFileToNFTStorage(file);
+          //     setLogo(uri);
+          //     toast.success("Succeed to upload logo!");
+          // } catch (err) {
+          //     console.log(err);
+          //     toast.warn("Failed to upload logo!");
+          // }
+      }
+      //setOpenLoading(false);
+    };
+    
+
+    const handleCreateToken = async () => {
+      if (!publicKey) {
+          //toast.warn("Please connect wallet!");
+          return;
+      }
+/*
+      if (formdata.name === "") {
+          //toast.warn("Please input name!");
+          return;
+      }
+
+      if (formdata.symbol === "") {
+          //toast.warn("Please input symbol!");
+          return;
+      }
+
+      if (formdata.decimals === "" || isNaN(Number(formdata.decimals))) {
+          //toast.warn("Please input decimals!");
+          return;
+      }
+
+      if (formdata.totalSupply === "" || isNaN(Number(formdata.totalSupply))) {
+          //toast.warn("Please input total supply!");
+          return;
+      }
+
+      setLoadingPrompt("Uploading metadata...");
+      setOpenLoading(true);
+*/      
+      try {
+          let metadata = {
+              name: formdata.name,
+              symbol: formdata.symbol,
+          };
+          if (formdata.file) metadata.image = formdata.file;
+          if (formdata.description) metadata.description = formdata.description;
+          // if (website || twitter || telegram || discord) {
+          //     metadata.extensions = {};
+          //     if (website) metadata.extensions.website = website;
+          //     if (twitter) metadata.extensions.twitter = twitter;
+          //     if (telegram) metadata.extensions.telegram = telegram;
+          //     if (discord) metadata.extensions.discord = discord;
+          // }
+
+          let uri = "";
+          try {
+              uri = await pinJsonToPinata(metadata);
+          } catch (error) {
+              console.log(error);
+              //uri = await pinJsonToNFTStorage(metadata);
+          }
+          console.log(uri);
+
+          //setLoadingPrompt("Creating tokens...");
+          try {
+              const { mint, transaction } = await createToken(
+                  connection,
+                  publicKey,
+                  formdata.name,
+                  formdata.symbol,
+                  formdata.uri,
+                  Number(formdata.decimals),
+                  Number(formdata.totalSupply),
+                  isMutable,
+                  mintPvKey
+              );
+              if (transaction) {
+                  let txns = [transaction];
+                  if (USE_JITO) {
+                    /*
+                      const tipTxn = await getTipTransaction(
+                          connection,
+                          publicKey,
+                          user.presets.jitoTip
+                      );
+                      txns.push(tipTxn);
+                    */
+                  }
+
+                  const signedTxns = await signAllTransactions(txns);
+                  const res = await sendAndConfirmSignedTransactions(
+                      USE_JITO,
+                      connection,
+                      signedTxns
+                  );
+                  if (res) {
+                      console.log("Mint Address:", mint.toBase58());
+                      setNotifyTitle("Token Address");
+                      setNotifyAddress(mint.toBase58());
+                      setNotifyAddressDialog(true);
+                      console.log("Succeed to create token!");
+                  } else console.log("Failed to create token!");
+              }
+          } catch (err) {
+              console.log(err);
+              //toast.warn("Failed to create token!");
+          }
+      } catch (err) {
+          console.log(err);
+          //toast.warn("Failed to upload metadata!");
+      }
+      //setOpenLoading(false);
     };
 
     const handleChange = (event) => {
@@ -216,7 +329,7 @@ const Createcoin = () => {
                                                   className="hidden"
                                                   type="file"
                                                   ref={fileInputRef}
-                                                  onChange={uploadImgHandler}
+                                                  onChange={handleUploadLogo}
                                               />
                                           {formdata.file === null ? (
                                               <div
