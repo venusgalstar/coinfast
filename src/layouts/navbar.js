@@ -6,7 +6,7 @@ import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 const navStringList = [
     {title:'Create Token', url:'/', target:'', rel:''},
-    {title:'Create Liquidity', url:'/#tokenomics', target:'_blank', rel:"noopener noreferrer"},
+    {title:'Create Liquidity', url:'https://raydium.io/liquidity/create-pool/', target:'_blank', rel:"noopener noreferrer"},
     {title:'Promote Token', url:'/promote', target:'', rel:''},
     {title:'Trending 🔥', url:'/trending', target:'', rel:''},
 ];
@@ -50,10 +50,10 @@ const Navbar = () => {
 
     return (
         <nav className="fixed top-[21px] md:top-[27px] left-0 right-0 z-50 bg-gray-800/50 backdrop-blur-sm border-b border-gray-700/50">
-            <div className="container mx-auto px-4">
-            <div className="flex justify-between items-center h-14 md:h-16">
+            <div className="container px-4 mx-auto">
+            <div className="flex items-center justify-between h-14 md:h-16">
                 <div className="flex items-center space-x-2 md:space-x-3">
-                    <button className="md:hidden p-2 text-gray-400 hover:text-white" onClick={handleMenuToggle}>
+                    <button className="p-2 text-gray-400 md:hidden hover:text-white" onClick={handleMenuToggle}>
                         <svg
                             className="w-6 h-6"
                             fill="none"
@@ -70,33 +70,33 @@ const Navbar = () => {
                         </svg>
                     </button>
                     <a
-                        className="hover:opacity-80 transition-opacity duration-200"
+                        className="transition-opacity duration-200 hover:opacity-80"
                         href="/"
                     >
                         <span className="font-bold truncate">
-                        <span className="hidden sm:inline bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500 text-2xl md:text-3xl font-extrabold tracking-tight">
+                        <span className="hidden text-2xl font-extrabold tracking-tight text-transparent sm:inline bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 md:text-3xl">
                             CoinFast
                         </span>
-                        <span className="sm:hidden bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500 text-2xl font-extrabold tracking-tight">
+                        <span className="text-2xl font-extrabold tracking-tight text-transparent sm:hidden bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">
                             CoinFast
                         </span>
                         </span>
                     </a>
                 </div>
-                <div className="hidden md:flex items-center justify-center flex-1">
+                <div className="items-center justify-center flex-1 hidden md:flex">
                     <div className="flex space-x-4">
                         {navStringList.map(item=>(
                             <a
-                                className="relative group px-4 py-2 text-sm md:text-base font-medium tracking-wide"
+                                className="relative px-4 py-2 text-sm font-medium tracking-wide group md:text-base"
                                 href={item.url}
                                 target={item.target}
                                 ref={item.ref}
                                 key={item.url}
                             >
-                                <span className="relative z-10 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-purple-500 group-hover:from-cyan-300 group-hover:to-purple-400 transition-all duration-200">
+                                <span className="relative z-10 text-transparent transition-all duration-200 bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 group-hover:from-cyan-300 group-hover:to-purple-400">
                                     {item.title}
                                 </span>
-                                <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                                <div className="absolute inset-0 transition-opacity duration-200 rounded-lg opacity-0 bg-gradient-to-r from-cyan-500/5 to-purple-500/5 group-hover:opacity-100" />
                             </a>
                         ))}
                     </div>
@@ -105,11 +105,11 @@ const Navbar = () => {
                     <WalletMultiButton />
                 </div>
                 {toggleMenu &&(
-                    <div className="md:hidden absolute top-full left-0 right-0 bg-gray-800/95 backdrop-blur-sm border-b border-gray-700/50">
+                    <div className="absolute left-0 right-0 border-b md:hidden top-full bg-gray-800/95 backdrop-blur-sm border-gray-700/50">
                         <div className="px-4 py-3 space-y-3">
                             {navStringList.map(item=>(
                                 <a
-                                    className="block text-gray-300 hover:text-white py-2"
+                                    className="block py-2 text-gray-300 hover:text-white"
                                     href={item.url}
                                     target={item.target}
                                     ref={item.ref}
